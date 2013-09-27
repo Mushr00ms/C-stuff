@@ -12,8 +12,8 @@ int main(int argc, char const *argv[])
 	void * addr = getenv(argv[1]);
 
 	if(addr == NULL)
-		printf("La variable %s n'existe pas.\n", argv[1]);
+		printf("The variable %s doesn't exist.\n", argv[1]);
 	else
-		printf("L'adresse d'environnement %s se trouve à l'adresse %p\n", argv[1], addr);
+		printf("Addr for %s : %p\n", argv[1], addr);
 	return 0;
 }
