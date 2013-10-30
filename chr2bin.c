@@ -13,15 +13,17 @@ int main (int argc, char *argv[])
 		return -1;
 	}
 
-	char string[256];
+	char string[128];
 
-	strncpy(string, argv[1], 128);
+	strncpy(string, argv[1], 127);
+	
+	string[128] = '\0';
 	
 	int len = str_len(string);
 	
 	strToBin(string, len);
+	
 	putchar('\n');
-
 	return 0; 
 }
 
