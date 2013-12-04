@@ -1,9 +1,11 @@
-#include <sys/socket.h>//socket()-bind()-listen()-accept()
-#include <arpa/inet.h>//htonl()-htons()-inet_ntoa()
-#include <stdio.h>//perror()-printf()
-#include <string.h>//strlen()-strcmp()
+#include <sys/socket.h>//socket()-bind()-listen()-accept()-inet_addr()-connect()-send()-shutdown()
+#include <arpa/inet.h>//htonl()-htons()-inet_ntoa()-inet_addr()
+#include <stdio.h>//perror()-printf()-fgets()
+#include <string.h>//strlen()-strcmp()-strstr()-memset()-strchr()
 
-#define PORT 2500
+
+#define PORT 31337
+#define SOCKET_ERROR -1
 
 typedef int SOCKET;
 typedef struct sockaddr_in sockaddr_in;
@@ -20,30 +22,44 @@ struct sockaddr_in
 
 int main(void)
 {
-	char buffer[50] = {0};
+	char buffer[256] =  "";
+	int c = 0;
+	
 	SOCKET sock;
 	sockaddr_in client;
 	socklen_t sizeClient = sizeof(client);
-	//creation socket
+	
 	sock = socket(AF_INET, SOCK_STREAM,0);
-	//contexte d'adressage
-	client.sin_addr.s_addr=inet_addr("127.0.0.1");
+	
+	client.sin_addr.s_addr = inet_addr("127.0.0.1");
 	client.sin_port = htons(PORT);
 	client.sin_family = AF_INET;
+
 	//int connect(int socket, struct sockaddr* addr, socklen_t addrlen);
 	if(connect(sock,(sockaddr*)&client,sizeClient) == 0)
 	{
-		printf("Connexion en cours @%s:%d..\n",inet_ntoa(client.sin_addr),htons(PORT));
-		while(strcmp(buffer, "exit") != 0)
+		printf("Connected to %s:%d..\n",inet_ntoa(client.sin_addr),htons(PORT));
+
+		while(1)
 		{
-			//int recv(int socket, void* buffer, size_t len, int flags)
-			if(recv(sock, (void *)buffer, sizeof(buffer),0)!=-1)
+			memset(buffer, 0 , 256);
+			printf("TXT > ");
+			scanf("%256s",buffer);
+			while((c = getchar()) != '\n');
+
+			//int send(int socket, void* buffer, size_t len, int flags);
+			if(send(sock,buffer,sizeof(buffer),0) != SOCKET_ERROR)
 			{
-				printf("Contenu envoyé par le serveur : %s (%d octets)\n", buffer, (int)strlen(buffer));
+				if(strstr(buffer,"!quit") != NULL)
+				{
+					shutdown(sock,2);
+					return 0;
+				}
+				printf("Sent : %s\n",buffer);
 			}
 			else
 			{
-				perror("recv");
+				perror("send");
 				return -1;
 			}
 		}
@@ -53,7 +69,8 @@ int main(void)
 		perror("connect");
 		return -1;
 	}
+
 	shutdown(sock,2);
-	//on ferme la co
+
 	return 0;
 }
