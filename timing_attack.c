@@ -4,10 +4,6 @@
 #include <string.h>//strlen()-bzero()
 #include <time.h>//time()-difftime()
 
-/*
-Here's a script that I used to solved a challenge about timing attack : http://en.wikipedia.org/wiki/Timing_attack
-*/
-
 typedef int SOCKET;
 typedef struct sockaddr_in sockaddr_in;
 typedef struct sockaddr sockaddr;
